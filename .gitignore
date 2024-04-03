@@ -21,3 +21,5 @@
 /canweteachthis/npm-debug.log*
 /canweteachthis/yarn-debug.log*
 /canweteachthis/yarn-error.log*
+
+/canweteachthis/.gitignore
