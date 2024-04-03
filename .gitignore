@@ -1,0 +1,23 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/canweteachthis/node_modules
+/canweteachthis/.pnp
+/canweteachthis/.pnp.js
+
+# testing
+/canweteachthis/coverage
+
+# production
+/canweteachthis/build
+
+# misc
+/canweteachthis/.DS_Store
+/canweteachthis/.env.local
+/canweteachthis/.env.development.local
+/canweteachthis/.env.test.local
+/canweteachthis/.env.production.local
+
+/canweteachthis/npm-debug.log*
+/canweteachthis/yarn-debug.log*
+/canweteachthis/yarn-error.log*
