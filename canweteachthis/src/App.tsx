@@ -1,8 +1,13 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 function App() {
+  const apiKey = process.env.API_KEY;
+
   return (
     <div className="App">
       <header className="App-header">
@@ -18,6 +23,7 @@ function App() {
         >
           Learn React
         </a>
+        <p>API Key: {apiKey}</p>
       </header>
     </div>
   );
