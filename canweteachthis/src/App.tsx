@@ -23,10 +23,8 @@ function App() {
         >
           Learn React
         </a>
-        <p>API Key: {apiKey}</p>
       </header>
     </div>
   );
 }
-
 export default App;
