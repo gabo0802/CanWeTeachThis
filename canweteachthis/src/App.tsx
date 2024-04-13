@@ -1,28 +1,30 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 function App() {
-  const apiKey = process.env.API_KEY;
+  const apiKey = process.env.REACT_APP_NEWS_API_KEY;
+
+  var url =
+    "https://newsapi.org/v2/everything?" +
+    "q='Evolution'+education&" +
+    "from=2024-04&" +
+    "sortBy=popularity&" +
+    "apiKey=" +
+    apiKey;
+
+  var req = new Request(url);
+
+  fetch(req).then(function (response) {
+    console.log("Requesting data from News API...");
+    console.log(response.json());
+  });
 
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h1 className="text-3xl font-bold underline">
+          Can We Teach This? Creative Reflection
+        </h1>
       </header>
     </div>
   );
