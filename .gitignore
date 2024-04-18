@@ -24,3 +24,5 @@
 
 /canweteachthis/.gitignore
 /canweteachthis/.env
+
+/api/data
