@@ -19,15 +19,17 @@ def hello_world():
 def fetch_AI_data():
    #check if the file exists
   print("Printing Request:")
-  print(request.json)
+  print("Request: ",request.json)
 
-  search_term = request.json['search_term']
+  search_term = str(request.json['search_term'])
+  print("Search term ",search_term)
 
   if not search_term:
     return make_response(jsonify({'error': 'Search term is required'}), 400)
-  
-  if os.path.exists('./data/{search_term}_news_data.csv'):
-    data = pandas.read_csv('./data/{search_term}_news_data.csv')
+  filename = ("./data/{0}_news_data.csv".format(search_term)) 
+  print(filename)
+  if os.path.exists(filename):
+    data = pandas.read_csv(filename)
     return data.to_json()
   else:
     return make_response(jsonify({'error': 'Data not found, method to generate data is not implemented yet'}), 404)

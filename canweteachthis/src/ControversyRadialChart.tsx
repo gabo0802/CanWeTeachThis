@@ -8,7 +8,7 @@ import { LinearGradient } from "@visx/gradient";
 import { AxisLeft } from "@visx/axis";
 import { GridRadial, GridAngle } from "@visx/grid";
 import { animated, useSpring } from "@react-spring/web";
-import { extent } from "d3-array"; // Import the extent function from d3-array
+// import { extent } from "d3-array"; // Import the extent function from d3-array
 
 // Initial Code Template Derived from Visx LineRadial Example: https://airbnb.io/visx/lineradial
 const green = "#e5fd3d";
@@ -22,28 +22,11 @@ const springConfig = {
 };
 
 // const NewsData: EvolutionNewsData[] = []; // Initialize with an empty array
-
-// Accessors modified for your data
-const getYear = (d: NewsData) => d.year;
-const getRelevance = (d: NewsData) => d.relevance;
-const getExplanation = (d: NewsData) => d.explanation;
-const formatTicks = (val: NumberLike) => String(val);
-// const maxNewsCount = Math.max(...NewsData.map(getNewsCount));
-
-// Scales modified for your data
-const xScale = scaleTime({
-  range: [0, Math.PI * 2],
-  domain: [1950, 2024], // Adjust your year range
-});
-// Handle Dynamically later
-const yScale = scaleLog<number>({
-  // placeholder for now
-  domain: extent([0, 1000]) as [number, number],
-});
-
-const angle = (d: NewsData) => xScale(getYear(d)) ?? 0;
-const radius = (d: NewsData) => yScale(getRelevance(d)) ?? 0;
-const padding = 20;
+//utils:
+function extent<Datum>(data: Datum[], value: (d: Datum) => number) {
+  const values = data.map(value);
+  return [Math.min(...values), Math.max(...values)];
+}
 
 // Handle Dynamically later
 // const firstPoint = NewsData[0];
@@ -68,6 +51,29 @@ function ControversyRadialChart({
 
   // Calculate maximum news count dynamically
   console.log(data);
+
+  // Accessors modified for your data
+  const getYear = (d: NewsData) => d.year;
+  const getRelevance = (d: NewsData) => d.relevance;
+  const getExplanation = (d: NewsData) => d.explanation;
+  const formatTicks = (val: NumberLike) => String(val);
+  // const maxNewsCount = Math.max(...NewsData.map(getNewsCount));
+
+  // Scales modified for your data
+  const xScale = scaleTime({
+    range: [0, Math.PI * 2],
+    domain: extent(data, getYear), // Adjust your year range
+  });
+  // Handle Dynamically later
+  const yScale = scaleLog<number>({
+    // placeholder for now
+    domain: extent(data, getRelevance),
+  });
+
+  const angle = (d: NewsData) => xScale(getYear(d)) ?? 0;
+  const radius = (d: NewsData) => yScale(getRelevance(d)) ?? 0;
+  const padding = 20;
+
   const maxNewsCount = Math.max(...data.map(getRelevance));
   yScale.domain([0, maxNewsCount]);
 
@@ -94,7 +100,7 @@ function ControversyRadialChart({
   // Update scale output to match component dimensions
   const reverseYScale = yScale.copy().range(yScale.range().reverse());
   const handlePress = () => setShouldAnimate(true);
-
+  let isLoading = data.length === 0 ? true : false;
   return (
     <>
       {animate && (
@@ -154,38 +160,45 @@ function ControversyRadialChart({
             tickFormat={formatTicks}
             hideAxisLine
           />
-          <LineRadial angle={angle} radius={radius} curve={curveBasisOpen}>
-            {({ path }) => {
-              const d = path(data) || "";
-              return (
-                <>
-                  <animated.path
-                    d={d}
-                    ref={lineRef}
-                    strokeWidth={2}
-                    strokeOpacity={0.8}
-                    strokeLinecap="round"
-                    fill="none"
-                    stroke={animate ? darkbackground : "url(#line-gradient)"}
-                  />
-                  {shouldAnimate && (
+          {data && data.length > 0 ? ( // Conditional Rendering!
+            <LineRadial angle={angle} radius={radius} curve={curveBasisOpen}>
+              {({ path }) => {
+                const d = path(data) || ""; // Ensure d is valid
+                return (
+                  <>
                     <animated.path
                       d={d}
+                      ref={lineRef}
                       strokeWidth={2}
                       strokeOpacity={0.8}
                       strokeLinecap="round"
                       fill="none"
-                      stroke="url(#line-gradient)"
-                      strokeDashoffset={spring.frame.interpolate(
-                        (v) => v * lineLength
-                      )}
-                      strokeDasharray={lineLength}
+                      stroke={animate ? darkbackground : "url(#line-gradient)"}
                     />
-                  )}
-                </>
-              );
-            }}
-          </LineRadial>
+                    {shouldAnimate && (
+                      <animated.path
+                        d={d}
+                        strokeWidth={2}
+                        strokeOpacity={0.8}
+                        strokeLinecap="round"
+                        fill="none"
+                        stroke="url(#line-gradient)"
+                        strokeDashoffset={spring.frame.interpolate(
+                          (v) => v * lineLength
+                        )}
+                        strokeDasharray={lineLength}
+                      />
+                    )}
+                  </>
+                );
+              }}
+            </LineRadial>
+          ) : (
+            // Loading or Error State
+            <text x={width / 2} y={height / 2} textAnchor="middle">
+              {isLoading ? "Loading..." : "Error fetching data"}
+            </text>
+          )}
 
           {[firstPoint, lastPoint].map((d, i) => {
             const cx = ((xScale(getYear(d)) ?? 0) * Math.PI) / 180;

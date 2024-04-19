@@ -25,7 +25,9 @@ async function fetchNewsData(searchTerm: any, startDate: any, endDate: any) {
   }
 }
 
-async function fetchAIData(searchTerm: string) {
+async function fetchAIData(searchTerm: any) {
+  console.log("fetchAIData called!");
+  console.log(searchTerm);
   const response = await fetch("http://localhost:5000/fetch_AI_data", {
     method: "POST",
     headers: {
@@ -38,6 +40,7 @@ async function fetchAIData(searchTerm: string) {
 
   if (response.ok) {
     const data = await response.json();
+    console.log(data);
     return data; // Assuming your API returns processed data in JSON format
   } else {
     throw new Error("Error fetching data from API");
@@ -63,18 +66,20 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log("fetchData called!");
       setIsLoading(true);
       setError(null); // Reset errors
       try {
         const data = await fetchAIData("evolution_edu");
-        console.log(data);
-        const tmp: NewsData[] = data.map(() => {
+        console.log("Data awaited", data);
+        const tmp: NewsData[] = Object.keys(data.year).map((index) => {
           return {
-            year: data.year,
-            relevance: data.relevance,
-            explanation: data.explanation,
+            year: data.year[index],
+            relevance: data.relevance[index],
+            explanation: data.explanation[index],
           };
         });
+        console.log("tmp", tmp);
         setNewsData(tmp); // Assign the value of tmp to newsData state variable
       } catch (error: unknown) {
         setError(error as SetStateAction<null>);
@@ -86,6 +91,7 @@ function App() {
     fetchData();
   }, []); // Fetch data only once on component mount
 
+  console.log(newsData);
   // useEffect(() => {
   //   const fetchData = async () => {
   //     setIsLoading(true);
@@ -115,11 +121,10 @@ function App() {
         </h1>
         {/* Conditional Rendering */}
         {isLoading && <p>Loading data from Back-End...</p>}
-        {error && <p>Error fetching data: {error}</p>}
-        {newsData && (
+        {error && <p>Error fetching data</p>}
+        {newsData.length > 0 && (
           <ControversyRadialChart width={1000} height={1000} data={newsData} />
         )}
-
         {/* Fallback to test data if needed  */}
         {!newsData && !isLoading && !error && (
           <ControversyRadialChart width={100} height={100} data={testData} />
