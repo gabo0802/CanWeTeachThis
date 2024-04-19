@@ -1,4 +1,4 @@
-import { EvolutionNewsData } from "./types";
+import { NewsData, createNewsData } from "./types";
 import React, { useRef, useState, useEffect } from "react";
 import { Group } from "@visx/group";
 import { LineRadial } from "@visx/shape";
@@ -24,8 +24,9 @@ const springConfig = {
 // const NewsData: EvolutionNewsData[] = []; // Initialize with an empty array
 
 // Accessors modified for your data
-const getYear = (d: EvolutionNewsData) => d.year;
-const getNewsCount = (d: EvolutionNewsData) => d.newsCount;
+const getYear = (d: NewsData) => d.year;
+const getRelevance = (d: NewsData) => d.relevance;
+const getExplanation = (d: NewsData) => d.explanation;
 const formatTicks = (val: NumberLike) => String(val);
 // const maxNewsCount = Math.max(...NewsData.map(getNewsCount));
 
@@ -40,8 +41,8 @@ const yScale = scaleLog<number>({
   domain: extent([0, 1000]) as [number, number],
 });
 
-const angle = (d: EvolutionNewsData) => xScale(getYear(d)) ?? 0;
-const radius = (d: EvolutionNewsData) => yScale(getNewsCount(d)) ?? 0;
+const angle = (d: NewsData) => xScale(getYear(d)) ?? 0;
+const radius = (d: NewsData) => yScale(getRelevance(d)) ?? 0;
 const padding = 20;
 
 // Handle Dynamically later
@@ -52,7 +53,7 @@ export type LineRadialProps = {
   width: number;
   height: number;
   animate?: boolean;
-  data: EvolutionNewsData[];
+  data: NewsData[];
 };
 
 function ControversyRadialChart({
@@ -67,7 +68,7 @@ function ControversyRadialChart({
 
   // Calculate maximum news count dynamically
   console.log(data);
-  const maxNewsCount = Math.max(...data.map(getNewsCount));
+  const maxNewsCount = Math.max(...data.map(getRelevance));
   yScale.domain([0, maxNewsCount]);
 
   // Calculate first and last points dynamically
@@ -188,7 +189,7 @@ function ControversyRadialChart({
 
           {[firstPoint, lastPoint].map((d, i) => {
             const cx = ((xScale(getYear(d)) ?? 0) * Math.PI) / 180;
-            const cy = -(yScale(getNewsCount(d)) ?? 0);
+            const cy = -(yScale(getRelevance(d)) ?? 0);
             return (
               <circle
                 key={`line-cap-${i}`}

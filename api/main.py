@@ -15,6 +15,23 @@ CORS(app)
 def hello_world():
   return 'Hello World'
 
+@app.route('/fetch_AI_data', methods=['POST'])
+def fetch_AI_data():
+   #check if the file exists
+  print("Printing Request:")
+  print(request.json)
+
+  search_term = request.json['search_term']
+
+  if not search_term:
+    return make_response(jsonify({'error': 'Search term is required'}), 400)
+  
+  if os.path.exists('./data/{search_term}_news_data.csv'):
+    data = pandas.read_csv('./data/{search_term}_news_data.csv')
+    return data.to_json()
+  else:
+    return make_response(jsonify({'error': 'Data not found, method to generate data is not implemented yet'}), 404)
+
 @app.route('/fetch_news_data', methods=['POST'])
 def fetch_news_data():
   #check if the file exists
