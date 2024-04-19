@@ -50,7 +50,6 @@ function ControversyRadialChart({
   const [shouldAnimate, setShouldAnimate] = useState<boolean>(false);
 
   // Calculate maximum news count dynamically
-  console.log(data);
 
   // Accessors modified for your data
   const getYear = (d: NewsData) => d.year;
@@ -65,17 +64,32 @@ function ControversyRadialChart({
     domain: extent(data, getYear), // Adjust your year range
   });
   // Handle Dynamically later
-  const yScale = scaleLog<number>({
-    // placeholder for now
-    domain: extent(data, getRelevance),
-  });
+  // const yScale = scaleLog<number>({
+  //   // placeholder for now
+  //   domain: extent(data, getRelevance),
+  // });
 
   const angle = (d: NewsData) => xScale(getYear(d)) ?? 0;
-  const radius = (d: NewsData) => yScale(getRelevance(d)) ?? 0;
-  const padding = 20;
+  const radius = (d: NewsData) => {
+    const relevance = getRelevance(d);
+    console.log("Relevance:", relevance); // Inspect
+    return yScale(relevance) ?? 0;
+  };
+
+  // const radius = (d: NewsData) => yScale(getRelevance(d)) ?? 0;
+  const padding = 30;
+
+  const yScale = scaleLog<number>({
+    domain: [100, 10], // Domain matches your relevance range
+    range: [height / 2 - padding, 0], // Adjust range as per your chart's dimensions
+  });
+
+  const minRelevance = Math.min(...data.map(getRelevance));
+  const maxRelevance = Math.max(...data.map(getRelevance));
+  console.log("Min Relevance:", minRelevance, "Max Relevance:", maxRelevance);
+  console.log("yScale Domain:", yScale.domain());
 
   const maxNewsCount = Math.max(...data.map(getRelevance));
-  yScale.domain([0, maxNewsCount]);
 
   // Calculate first and last points dynamically
   const firstPoint = data[0];
