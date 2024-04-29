@@ -2,23 +2,23 @@ import { NewsData, createNewsData } from "./types";
 import React, { useRef, useState, useEffect } from "react";
 import { Group } from "@visx/group";
 import { LineRadial } from "@visx/shape";
-import { scaleTime, scaleLog, NumberLike } from "@visx/scale";
-import { curveBasisOpen } from "@visx/curve";
+import { scaleLog, NumberLike, scaleLinear } from "@visx/scale";
+import { curveBasisOpen, curveLinearClosed, curveNatural } from "@visx/curve";
 import { LinearGradient } from "@visx/gradient";
 import { AxisLeft } from "@visx/axis";
 import { GridRadial, GridAngle } from "@visx/grid";
 import { animated, useSpring } from "@react-spring/web";
-// import { extent } from "d3-array"; // Import the extent function from d3-array
 
 // Initial Code Template Derived from Visx LineRadial Example: https://airbnb.io/visx/lineradial
-const green = "#e5fd3d";
-export const blue = "#aeeef8";
-const darkgreen = "#dff84d";
-export const background = "#744cca";
-const darkbackground = "#603FA8";
+const green = "#FC8E27";
+export const blue = "#3019FF";
+const darkgreen = "#FF3030";
+export const background = "#A6AFFF";
+const darkbackground = "#000000";
+const black = "#000000";
 const strokeColor = "#744cca";
 const springConfig = {
-  tension: 20,
+  tension: 15,
 };
 
 // const NewsData: EvolutionNewsData[] = []; // Initialize with an empty array
@@ -59,7 +59,7 @@ function ControversyRadialChart({
   // const maxNewsCount = Math.max(...NewsData.map(getNewsCount));
 
   // Scales modified for your data
-  const xScale = scaleTime({
+  const xScale = scaleLinear({
     range: [0, Math.PI * 2],
     domain: extent(data, getYear), // Adjust your year range
   });
@@ -72,14 +72,16 @@ function ControversyRadialChart({
   const angle = (d: NewsData) => xScale(getYear(d)) ?? 0;
   const radius = (d: NewsData) => {
     const relevance = getRelevance(d);
-    console.log("Relevance:", relevance); // Inspect
     return yScale(relevance) ?? 0;
   };
 
   // const radius = (d: NewsData) => yScale(getRelevance(d)) ?? 0;
-  const padding = 30;
-
-  xScale.domain([1955, 2015]);
+  const padding = 60;
+  const firstYear = data[0].year;
+  const lastYear = data[data.length - 1].year;
+  console.log("First Year:", data[0].year);
+  console.log("Last Year:", data[data.length - 1].year);
+  xScale.domain([firstYear, lastYear]);
 
   const yScale = scaleLog<number>({
     domain: [100, 10], // Domain matches your relevance range
@@ -118,120 +120,183 @@ function ControversyRadialChart({
   const handlePress = () => setShouldAnimate(true);
   let isLoading = data.length === 0 ? true : false;
   return (
-    <div className="flex flex-col items-center justify-center h-screen p-4">
-      {animate && (
-        <>
-          <button
-            className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow mb-4 "
-            type="button"
-            onClick={handlePress}
-            onTouchStart={handlePress}
-          >
-            Animate
-          </button>
-          <br />
-        </>
-      )}
-      <svg
-        width={width}
-        height={height}
-        onClick={() => setShouldAnimate(!shouldAnimate)}
-      >
-        <LinearGradient from={green} to={blue} id="line-gradient" />
-        <rect width={width} height={height} fill={background} rx={14} />
-        <Group top={height / 2} left={width / 2}>
-          <GridAngle
-            scale={xScale}
-            outerRadius={height / 2 - padding}
-            stroke={green}
-            strokeWidth={1}
-            strokeOpacity={0.3}
-            strokeDasharray="5,2"
-            numTicks={20}
-          />
-          <GridRadial
-            scale={yScale}
-            numTicks={5}
-            stroke={blue}
-            strokeWidth={1}
-            fill={blue}
-            fillOpacity={0.1}
-            strokeOpacity={0.2}
-          />
-          <AxisLeft
-            top={-height / 2 + padding}
-            scale={reverseYScale}
-            numTicks={5}
-            tickStroke="none"
-            tickLabelProps={{
-              fontSize: 8,
-              fill: blue,
-              fillOpacity: 1,
-              textAnchor: "middle",
-              dx: "1em",
-              dy: "-0.5em",
-              stroke: strokeColor,
-              strokeWidth: 0.5,
-              paintOrder: "stroke",
-            }}
-            tickFormat={formatTicks}
-            hideAxisLine
-          />
-          {data && data.length > 0 ? ( // Conditional Rendering!
-            <LineRadial angle={angle} radius={radius} curve={curveBasisOpen}>
-              {({ path }) => {
-                const d = path(data) || ""; // Ensure d is valid
-                return (
-                  <>
-                    <animated.path
-                      d={d}
-                      ref={lineRef}
-                      strokeWidth={2}
-                      strokeOpacity={0.8}
-                      strokeLinecap="round"
-                      fill="none"
-                      stroke={animate ? darkbackground : "url(#line-gradient)"}
-                    />
-                    {shouldAnimate && (
+    <div>
+      <div className="flex flex-col items-center justify-center h-screen p-2">
+        {animate && (
+          <>
+            <button
+              className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow mb-4 "
+              type="button"
+              onClick={handlePress}
+              onTouchStart={handlePress}
+            >
+              Animate
+            </button>
+            <br />
+          </>
+        )}
+        <svg
+          width={width}
+          height={height}
+          onClick={() => setShouldAnimate(!shouldAnimate)}
+        >
+          <LinearGradient from={green} to={blue} id="line-gradient" />
+          <rect width={width} height={height} fill={background} rx={14} />
+          <Group top={height / 2} left={width / 2}>
+            <GridAngle
+              scale={xScale}
+              outerRadius={height / 2 - padding}
+              stroke={green}
+              strokeWidth={1}
+              strokeOpacity={0.3}
+              strokeDasharray="5,2"
+              numTicks={20}
+            />
+            <GridRadial
+              scale={yScale}
+              numTicks={5}
+              stroke={blue}
+              strokeWidth={1}
+              fill={blue}
+              fillOpacity={0.1}
+              strokeOpacity={0.2}
+            />
+            <AxisLeft
+              top={-height / 2 + padding}
+              scale={reverseYScale}
+              numTicks={5}
+              tickStroke="none"
+              tickLabelProps={{
+                fontSize: 10,
+                fill: darkgreen,
+                fillOpacity: 2,
+                textAnchor: "middle",
+                dx: "1em",
+                dy: "-0.5em",
+                stroke: strokeColor,
+                strokeWidth: 0.5,
+                paintOrder: "stroke",
+              }}
+              tickFormat={formatTicks}
+              hideAxisLine
+            />
+            {data && data.length > 0 ? ( // Conditional Rendering!
+              <LineRadial angle={angle} radius={radius} curve={curveNatural}>
+                {({ path }) => {
+                  console.log("Data received by the path function:", path);
+                  const d =
+                    path(
+                      data.map((d) => ({
+                        year: d.year,
+                        relevance: d.relevance,
+                      }))
+                    ) || ""; // Ensure d is valid
+
+                  // console.log("Data received by the path function:", d);
+                  return (
+                    <>
+                      {data.map((d, i) => {
+                        const angle = xScale(getYear(d)) ?? 0;
+                        const radius = yScale(getRelevance(d) ?? 0); // Place on outer edge
+
+                        // cx={radius * -Math.sin(angle)}
+                        // cy={radius * -Math.cos(angle)}
+
+                        const cx = -(radius * Math.sin(angle + Math.PI)); // Add Math.PI
+                        const cy = radius * Math.cos(angle + Math.PI); // Add Math.PI
+                        return (
+                          <circle
+                            key={`angle-marker-${i}`}
+                            cx={cx}
+                            cy={cy}
+                            r={3}
+                            fill="red"
+                          />
+                        );
+                      })}
                       <animated.path
-                        d={d}
+                        d={d} // produces the incorrect output
+                        ref={lineRef}
                         strokeWidth={2}
                         strokeOpacity={0.8}
                         strokeLinecap="round"
                         fill="none"
-                        stroke="url(#line-gradient)"
-                        strokeDashoffset={spring.frame.interpolate(
-                          (v) => v * lineLength
-                        )}
-                        strokeDasharray={lineLength}
+                        stroke={
+                          animate ? darkbackground : "url(#line-gradient)"
+                        }
                       />
-                    )}
-                  </>
-                );
-              }}
-            </LineRadial>
-          ) : (
-            // Loading or Error State
-            <text x={width / 2} y={height / 2} textAnchor="middle">
-              {isLoading ? "Loading..." : "Error fetching data"}
-            </text>
-          )}
 
-          {[firstPoint, lastPoint].map((d, i) => {
-            const cx = ((xScale(getYear(d)) ?? 0) * Math.PI) / 180;
-            const cy = -(yScale(getRelevance(d)) ?? 0);
-            return (
-              <circle
-                key={`line-cap-${i}`}
-                cx={cx}
-                cy={cy}
-                fill={darkgreen}
-                r={3}
-              />
-            );
-          })}
-        </Group>
-      </svg>
+                      {shouldAnimate && (
+                        <animated.path
+                          d={d} // produces incorrect output
+                          strokeWidth={2}
+                          strokeOpacity={0.8}
+                          strokeLinecap="round"
+                          fill="none"
+                          stroke="url(#line-gradient)"
+                          strokeDashoffset={spring.frame.interpolate(
+                            (v) => v * lineLength
+                          )}
+                          strokeDasharray={lineLength}
+                        />
+                      )}
+                    </>
+                  );
+                }}
+              </LineRadial>
+            ) : (
+              // Loading or Error State
+              <text x={width / 2} y={height / 2} textAnchor="middle">
+                {isLoading ? "Loading..." : "Error fetching data"}
+              </text>
+            )}
+
+            {data.map((d, i) => {
+              const year = getYear(d);
+              const angle = xScale(year) ?? 0;
+              let radius = yScale(getRelevance(d)) ?? 0;
+              if (year == firstYear) {
+                radius = height / 2 - padding + 35; // Place labels along the outer edge
+              } else {
+                radius = height / 2 - padding + 25; // Place labels along the outer edge
+              }
+              return (
+                <text
+                  key={`year-label-${i}`}
+                  x={radius * Math.sin(angle)}
+                  y={radius * -Math.cos(angle)}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fontSize="10px"
+                >
+                  {year}
+                </text>
+              );
+            })}
+            {[firstPoint, lastPoint].map((d, i) => {
+              const cx = ((xScale(getYear(d)) ?? 0) * Math.PI) / 180;
+              const cy = -yScale(getRelevance(d)) ?? 0;
+              return (
+                <circle
+                  key={`line-cap-${i}`}
+                  cx={cx}
+                  cy={cy}
+                  fill={darkgreen}
+                  r={3}
+                />
+              );
+            })}
+          </Group>
+        </svg>
+      </div>
+      <div className="mt-10">
+        <h1 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
+          Explanations
+        </h1>
+        <p className="text-center text-gray-800 dark:text-white">
+          {getExplanation(data[0])}
+        </p>
+      </div>
     </div>
   );
 }

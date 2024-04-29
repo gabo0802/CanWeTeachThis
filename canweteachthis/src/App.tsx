@@ -163,12 +163,12 @@ function App() {
           <h1 className="text-7xl text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400 text-center mt-20  font-bold">
             {convertDropdown(selectedOption)} Chart
           </h1>
-          <ControversyRadialChart width={900} height={900} data={newsData} />
+          <ControversyRadialChart width={800} height={800} data={newsData} />
         </>
       )}
       {/* Fallback to test data if needed  */}
       {!newsData && !isLoading && !error && (
-        <ControversyRadialChart width={900} height={900} data={testData} />
+        <ControversyRadialChart width={800} height={800} data={testData} />
       )}
     </div>
   );
