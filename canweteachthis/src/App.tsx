@@ -2,6 +2,7 @@ import "./App.css";
 import React, { useState, useEffect, SetStateAction } from "react";
 import { NewsData, createNewsData } from "./types";
 import ControversyRadialChart from "./ControversyRadialChart";
+import Spinner from "./Components/Spinner-Tw";
 
 // Unused because News API does not support news data older than a month on the free tier
 async function fetchNewsData(searchTerm: any, startDate: any, endDate: any) {
@@ -91,7 +92,7 @@ function App() {
     fetchData();
   }, []); // Fetch data only once on component mount
 
-  console.log(newsData);
+  // console.log(newsData);
   // useEffect(() => {
   //   const fetchData = async () => {
   //     setIsLoading(true);
@@ -115,21 +116,33 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <h1 className="text-3xl font-bold underline">
+      <header>
+        <h1 className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-center p-10 mt-20 mb-5">
           Can We Teach This? Creative Reflection
         </h1>
-        {/* Conditional Rendering */}
-        {isLoading && <p>Loading data from Back-End...</p>}
-        {error && <p>Error fetching data</p>}
-        {newsData.length > 0 && (
-          <ControversyRadialChart width={1000} height={1000} data={newsData} />
-        )}
-        {/* Fallback to test data if needed  */}
-        {!newsData && !isLoading && !error && (
-          <ControversyRadialChart width={100} height={100} data={testData} />
-        )}
+        <h2 className="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-3xl lg:text-4xl dark:text-white text-center">
+          By Gabriel Castejon
+        </h2>
       </header>
+      {/* Conditional Rendering */}
+
+      {isLoading && (
+        <div className="p-10 m-10">
+          <p>Loading data from Back-End...</p>
+          {/* fix this, not showing up */}
+          <Spinner />
+        </div>
+      )}
+      {error && (
+        <p className="text-red-500 text-4xl text-center">Error fetching data</p>
+      )}
+      {newsData.length > 0 && (
+        <ControversyRadialChart width={1000} height={1000} data={newsData} />
+      )}
+      {/* Fallback to test data if needed  */}
+      {!newsData && !isLoading && !error && (
+        <ControversyRadialChart width={1000} height={1000} data={testData} />
+      )}
     </div>
   );
 }

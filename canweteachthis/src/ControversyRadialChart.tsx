@@ -79,6 +79,8 @@ function ControversyRadialChart({
   // const radius = (d: NewsData) => yScale(getRelevance(d)) ?? 0;
   const padding = 30;
 
+  xScale.domain([1955, 2015]);
+
   const yScale = scaleLog<number>({
     domain: [100, 10], // Domain matches your relevance range
     range: [height / 2 - padding, 0], // Adjust range as per your chart's dimensions
@@ -89,7 +91,7 @@ function ControversyRadialChart({
   console.log("Min Relevance:", minRelevance, "Max Relevance:", maxRelevance);
   console.log("yScale Domain:", yScale.domain());
 
-  const maxNewsCount = Math.max(...data.map(getRelevance));
+  // const maxNewsCount = Math.max(...data.map(getRelevance));
 
   // Calculate first and last points dynamically
   const firstPoint = data[0];
@@ -116,10 +118,11 @@ function ControversyRadialChart({
   const handlePress = () => setShouldAnimate(true);
   let isLoading = data.length === 0 ? true : false;
   return (
-    <>
+    <div className="flex flex-col items-center justify-center h-screen p-4">
       {animate && (
         <>
           <button
+            className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow mb-4 "
             type="button"
             onClick={handlePress}
             onTouchStart={handlePress}
@@ -229,7 +232,7 @@ function ControversyRadialChart({
           })}
         </Group>
       </svg>
-    </>
+    </div>
   );
 }
 
