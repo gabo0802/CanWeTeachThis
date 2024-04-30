@@ -79,8 +79,8 @@ function ControversyRadialChart({
   const padding = 60;
   const firstYear = data[0].year;
   const lastYear = data[data.length - 1].year;
-  console.log("First Year:", data[0].year);
-  console.log("Last Year:", data[data.length - 1].year);
+  // console.log("First Year:", data[0].year);
+  // console.log("Last Year:", data[data.length - 1].year);
   xScale.domain([firstYear, lastYear]);
 
   const yScale = scaleLog<number>({
@@ -90,8 +90,8 @@ function ControversyRadialChart({
 
   const minRelevance = Math.min(...data.map(getRelevance));
   const maxRelevance = Math.max(...data.map(getRelevance));
-  console.log("Min Relevance:", minRelevance, "Max Relevance:", maxRelevance);
-  console.log("yScale Domain:", yScale.domain());
+  // console.log("Min Relevance:", minRelevance, "Max Relevance:", maxRelevance);
+  // console.log("yScale Domain:", yScale.domain());
 
   // const maxNewsCount = Math.max(...data.map(getRelevance));
 
@@ -122,19 +122,21 @@ function ControversyRadialChart({
   return (
     <div>
       <div className="flex flex-col items-center justify-center h-screen p-2">
-        {animate && (
-          <>
-            <button
-              className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow mb-4 "
-              type="button"
-              onClick={handlePress}
-              onTouchStart={handlePress}
-            >
-              Animate
-            </button>
-            <br />
-          </>
-        )}
+        <div className="flex mx-100">
+          {animate && (
+            <>
+              <button
+                className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow mb-4"
+                type="button"
+                onClick={handlePress}
+                onTouchStart={handlePress}
+              >
+                Animate
+              </button>
+              <br />
+            </>
+          )}
+        </div>
         <svg
           width={width}
           height={height}
@@ -183,7 +185,7 @@ function ControversyRadialChart({
             {data && data.length > 0 ? ( // Conditional Rendering!
               <LineRadial angle={angle} radius={radius} curve={curveNatural}>
                 {({ path }) => {
-                  console.log("Data received by the path function:", path);
+                  // console.log("Data received by the path function:", path);
                   const d =
                     path(
                       data.map((d) => ({
@@ -289,13 +291,21 @@ function ControversyRadialChart({
           </Group>
         </svg>
       </div>
-      <div className="mt-10">
-        <h1 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
+      <div className="my-10 mx-40 border-solid border-black border-4 p-20 bg-gradient-to-r from-indigo-800 to-indigo-900">
+        <h1 className="text-5xl font-bold text-center text-gray-800 dark:text-white mb-10 hover:font-extrabold">
           Explanations
         </h1>
-        <p className="text-center text-gray-800 dark:text-white">
-          {getExplanation(data[0])}
-        </p>
+        <div className="explanations-container">
+          {data.map((d, i) => (
+            <p
+              key={`explanation-${i}`}
+              className="text-left text-gray-800 dark:text-white italic"
+            >
+              {"•\t"}
+              {getExplanation(d)}
+            </p>
+          ))}
+        </div>
       </div>
     </div>
   );

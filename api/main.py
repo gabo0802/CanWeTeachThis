@@ -18,11 +18,11 @@ def hello_world():
 @app.route('/fetch_AI_data', methods=['POST'])
 def fetch_AI_data():
    #check if the file exists
-  print("Printing Request:")
-  print("Request: ",request.json)
+  # print("Printing Request:")
+  # print("Request: ",request.json)
 
   search_term = str(request.json['search_term'])
-  print("Search term ",search_term)
+  # 
 
   if not search_term:
     return make_response(jsonify({'error': 'Search term is required'}), 400)
@@ -52,7 +52,8 @@ def fetch_news_data():
     return make_response(jsonify({'error': 'Search term is required'}), 400)
   
   if os.path.exists('./data/{search_term}_news_data.csv'):
-    data = pandas.read_csv('./data/{search_term}_news_data.csv')
+    data = pandas.read_csv('./data/{search_term}_news_data.csv', delimiter=',', quotechar='"', escapechar='\\')
+    print(data)
     return data.to_json()
   else:
     api_key = os.getenv('REACT_APP_NEWS_API_KEY')

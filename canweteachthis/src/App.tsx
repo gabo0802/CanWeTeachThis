@@ -71,15 +71,14 @@ function App() {
   const [selectedOption, setSelectedOption] = useState("");
 
   const testData: NewsData[] = [
-    createNewsData(1950, 10),
-    createNewsData(1950, 10),
-    createNewsData(1960, 20),
+    createNewsData(1950, 60),
+    createNewsData(1960, 40),
     createNewsData(1970, 30),
     createNewsData(1980, 40),
     createNewsData(1990, 30),
-    createNewsData(2000, 20),
-    createNewsData(2010, 10),
-    createNewsData(2020, 40),
+    createNewsData(2000, 50),
+    createNewsData(2010, 60),
+    createNewsData(2020, 70),
   ];
 
   useEffect(() => {
@@ -89,6 +88,7 @@ function App() {
       setError(null); // Reset errors
       try {
         const data = await fetchAIData(selectedOption);
+        console.log(data);
         const tmp: NewsData[] = Object.keys(data.year).map((index) => {
           return {
             year: data.year[index],
@@ -99,6 +99,7 @@ function App() {
         console.log("tmp", tmp);
         setNewsData(tmp); // Assign the value of tmp to newsData state variable
       } catch (error: unknown) {
+        console.log("error", error);
         setError(error as SetStateAction<null>);
       } finally {
         setIsLoading(false);
@@ -133,10 +134,10 @@ function App() {
   return (
     <div className="App">
       <header>
-        <h1 className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-center p-10 mt-20 mb-5">
+        <h1 className="text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-center p-10 pb-1 mt-20">
           Can We Teach This? Creative Reflection
         </h1>
-        <h2 className="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-3xl lg:text-4xl dark:text-white text-center">
+        <h2 className="text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-3xl lg:text-4xl dark:text-white text-center">
           By Gabriel Castejon
         </h2>
         <p className="my-10" />
@@ -148,21 +149,28 @@ function App() {
       {/* Conditional Rendering */}
 
       {isLoading && (
-        <div className="p-10 m-10">
-          <p>Loading data from Back-End...</p>
-          <Spinner />
-        </div>
+        <>
+          <div className="p-10 m-10 text-center">
+            <p>Loading data from Back-End...</p>
+            <Spinner />
+          </div>
+        </>
       )}
       {error && (
-        <p className="text-red-500 text-4xl text-center my-10 font-bold">
-          Error Fetching Data
-        </p>
-      )}
-      {newsData.length > 0 && (
         <>
-          <h1 className="text-7xl text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400 text-center mt-20  font-bold">
-            {convertDropdown(selectedOption)} Chart
+          <h1 className="text-red-500 text-4xl text-center mt-10 font-bold">
+            Error Fetching Data, loading test data
           </h1>
+          <ControversyRadialChart width={800} height={800} data={testData} />
+        </>
+      )}
+      {!error && newsData.length > 0 && (
+        <>
+          <div className="text-center mt-20">
+            <span className="text-7xl text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400 animate-text font-bold">
+              {convertDropdown(selectedOption)} Chart
+            </span>
+          </div>
           <ControversyRadialChart width={800} height={800} data={newsData} />
         </>
       )}
